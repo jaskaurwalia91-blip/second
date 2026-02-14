@@ -7,22 +7,41 @@ import os
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'jkw_construction_secret_key_2024')  # Use env var for security
-app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static/uploads')
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
+
+# ==============================
+# BASIC CONFIG
+# ==============================
+
+app.secret_key = os.environ.get('SECRET_KEY', 'jkw_construction_secret_key_2024')
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'static/uploads')
+app.config['DATABASE'] = os.path.join(BASE_DIR, 'database/jkw_construction.db')
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB
+
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'dwg', 'xlsx', 'xls'}
 
-# Database connection
+# Ensure folders exist (VERY IMPORTANT for Render)
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, 'database'), exist_ok=True)
+
+# ==============================
+# DATABASE CONNECTION
+# ==============================
+
 def get_db():
-    conn = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'database/jkw_construction.db'))
+    conn = sqlite3.connect(app.config['DATABASE'])
     conn.row_factory = sqlite3.Row
     return conn
 
-# Check if file extension is allowed
+# ==============================
+# HELPERS
+# ==============================
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Login required decorator
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -32,7 +51,6 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# Role required decorator
 def role_required(*roles):
     def decorator(f):
         @wraps(f)
@@ -44,17 +62,27 @@ def role_required(*roles):
         return decorated_function
     return decorator
 
-# -------------------
-# Your existing routes remain unchanged
-# Just ensure all file paths use app.config['UPLOAD_FOLDER'] or database path from get_db()
-# -------------------
+# ==============================
+# HOME ROUTE (FIXES 404)
+# ==============================
 
-# Example for file upload in staff_upload:
-# filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+@app.route("/")
+def home():
+    return redirect(url_for("login"))  # Redirect to login page
 
-# -------------------
-# RUN APP
-# -------------------
+# ==============================
+# EXAMPLE LOGIN ROUTE (SAFE FALLBACK)
+# Agar already hai to ye remove kar sakti ho
+# ==============================
+
+@app.route("/login")
+def login():
+    return "Login Page Working ✅"
+
+# ==============================
+# RUN APP (Render Compatible)
+# ==============================
+
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Render sets PORT env
+    port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
