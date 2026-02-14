@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.project_name }} - My Documents{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="page-header">
+        <div>
+            <h1><i class="fas fa-folder-open"></i> {{ project.project_name }}</h1>
+            <p style="color: #666; margin-top: 5px;">
+                <i class="fas fa-map-marker-alt"></i> {{ project.location or 'N/A' }} | 
+                <i class="fas fa-user-tie"></i> {{ project.client_name or 'N/A' }}
+            </p>
+        </div>
+        <a href="{{ url_for('staff_documents') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Projects
+        </a>
+    </div>
+
+    <!-- DPR - Daily Progress Reports -->
+    <div class="content-card">
+        <div class="card-header category-header-dpr">
+            <h2><i class="fas fa-file-alt"></i> Daily Progress Reports (DPR)</h2>
+            <button class="btn btn-light btn-sm" onclick="openUploadModal('DPR', '{{ project.id }}', '{{ project.project_name }}')">
+                <i class="fas fa-upload"></i> Upload DPR
+            </button>
+        </div>
+        <div class="card-body">
+            {% if dpr_docs %}
+            <div class="document-grid">
+                {% for doc in dpr_docs %}
+                <div class="document-item">
+                    <div class="doc-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="doc-info">
+                        <h4>{{ doc.document_title }}</h4>
+                        <p><i class="fas fa-clock"></i> {{ doc.upload_date }}</p>
+                        {% if doc.description %}
+                        <p class="doc-desc">{{ doc.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="doc-actions">
+                        <a href="{{ url_for('download_document', doc_id=doc.id) }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <button class="btn btn-sm btn-info" onclick="editDocument({{ doc.id }}, '{{ doc.document_title }}', '{{ doc.description }}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <a href="{{ url_for('staff_delete_document', doc_id=doc.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this document?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted text-center">No DPR documents uploaded yet</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- MOM - Minutes of Meeting -->
+    <div class="content-card">
+        <div class="card-header category-header-mom">
+            <h2><i class="fas fa-clipboard-list"></i> Minutes of Meeting (MOM)</h2>
+            <button class="btn btn-light btn-sm" onclick="openUploadModal('MOM', '{{ project.id }}', '{{ project.project_name }}')">
+                <i class="fas fa-upload"></i> Upload MOM
+            </button>
+        </div>
+        <div class="card-body">
+            {% if mom_docs %}
+            <div class="document-grid">
+                {% for doc in mom_docs %}
+                <div class="document-item">
+                    <div class="doc-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="doc-info">
+                        <h4>{{ doc.document_title }}</h4>
+                        <p><i class="fas fa-clock"></i> {{ doc.upload_date }}</p>
+                        {% if doc.description %}
+                        <p class="doc-desc">{{ doc.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="doc-actions">
+                        <a href="{{ url_for('download_document', doc_id=doc.id) }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <button class="btn btn-sm btn-info" onclick="editDocument({{ doc.id }}, '{{ doc.document_title }}', '{{ doc.description }}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <a href="{{ url_for('staff_delete_document', doc_id=doc.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this document?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted text-center">No MOM documents uploaded yet</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Weekly Progress Reports -->
+    <div class="content-card">
+        <div class="card-header category-header-weekly">
+            <h2><i class="fas fa-calendar-week"></i> Weekly Progress Reports</h2>
+            <button class="btn btn-light btn-sm" onclick="openUploadModal('WEEKLY_REPORT', '{{ project.id }}', '{{ project.project_name }}')">
+                <i class="fas fa-upload"></i> Upload Weekly Report
+            </button>
+        </div>
+        <div class="card-body">
+            {% if weekly_docs %}
+            <div class="document-grid">
+                {% for doc in weekly_docs %}
+                <div class="document-item">
+                    <div class="doc-icon">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <div class="doc-info">
+                        <h4>{{ doc.document_title }}</h4>
+                        <p><i class="fas fa-clock"></i> {{ doc.upload_date }}</p>
+                        {% if doc.description %}
+                        <p class="doc-desc">{{ doc.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="doc-actions">
+                        <a href="{{ url_for('download_document', doc_id=doc.id) }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <button class="btn btn-sm btn-info" onclick="editDocument({{ doc.id }}, '{{ doc.document_title }}', '{{ doc.description }}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <a href="{{ url_for('staff_delete_document', doc_id=doc.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this document?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted text-center">No weekly reports uploaded yet</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Site Photos -->
+    <div class="content-card">
+        <div class="card-header category-header-photos">
+            <h2><i class="fas fa-camera"></i> Site Photos</h2>
+            <button class="btn btn-light btn-sm" onclick="openUploadModal('SITE_PHOTOS', '{{ project.id }}', '{{ project.project_name }}')">
+                <i class="fas fa-upload"></i> Upload Photos
+            </button>
+        </div>
+        <div class="card-body">
+            {% if photo_docs %}
+            <div class="document-grid">
+                {% for doc in photo_docs %}
+                <div class="document-item">
+                    <div class="doc-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="doc-info">
+                        <h4>{{ doc.document_title }}</h4>
+                        <p><i class="fas fa-clock"></i> {{ doc.upload_date }}</p>
+                        {% if doc.description %}
+                        <p class="doc-desc">{{ doc.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="doc-actions">
+                        <a href="{{ url_for('download_document', doc_id=doc.id) }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <button class="btn btn-sm btn-info" onclick="editDocument({{ doc.id }}, '{{ doc.document_title }}', '{{ doc.description }}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <a href="{{ url_for('staff_delete_document', doc_id=doc.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this photo?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted text-center">No site photos uploaded yet</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Upload Document Modal -->
+<div id="uploadModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="uploadModalTitle">Upload Document</h2>
+            <span class="modal-close" onclick="closeModal('uploadModal')">&times;</span>
+        </div>
+        <form method="POST" action="{{ url_for('staff_upload') }}" enctype="multipart/form-data">
+            <input type="hidden" id="upload_project_id" name="project_id">
+            <input type="hidden" id="upload_category" name="category">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="document_title">Document Title *</label>
+                    <input type="text" id="document_title" name="document_title" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description (Optional)</label>
+                    <textarea id="description" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="file">Select File *</label>
+                    <input type="file" id="file" name="file" required>
+                    <small>Allowed formats: PDF, DOC, DOCX, JPG, PNG, DWG, XLS, XLSX (Max 50MB)</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('uploadModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Document Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Document</h2>
+            <span class="modal-close" onclick="closeModal('editModal')">&times;</span>
+        </div>
+        <form method="POST" id="editDocForm">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit_document_title">Document Title *</label>
+                    <input type="text" id="edit_document_title" name="document_title" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_description">Description</label>
+                    <textarea id="edit_description" name="description" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openUploadModal(category, projectId, projectName) {
+    const categoryNames = {
+        'DPR': 'Daily Progress Report',
+        'MOM': 'Minutes of Meeting',
+        'WEEKLY_REPORT': 'Weekly Progress Report',
+        'SITE_PHOTOS': 'Site Photo'
+    };
+    
+    document.getElementById('uploadModalTitle').textContent = 'Upload ' + categoryNames[category];
+    document.getElementById('upload_project_id').value = projectId;
+    document.getElementById('upload_category').value = category;
+    document.getElementById('document_title').value = '';
+    document.getElementById('description').value = '';
+    document.getElementById('file').value = '';
+    openModal('uploadModal');
+}
+
+function editDocument(docId, title, description) {
+    document.getElementById('edit_document_title').value = title;
+    document.getElementById('edit_description').value = description || '';
+    document.getElementById('editDocForm').action = '/staff/document/edit/' + docId;
+    openModal('editModal');
+}
+</script>
+{% endblock %}

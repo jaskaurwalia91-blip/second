@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.project_name }} - Documents{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="page-header">
+        <div>
+            <h1><i class="fas fa-folder-open"></i> {{ project.project_name }}</h1>
+            <p style="color: #666; margin-top: 5px;">
+                <i class="fas fa-map-marker-alt"></i> {{ project.location or 'N/A' }} | 
+                <i class="fas fa-user-tie"></i> {{ project.client_name or 'N/A' }}
+            </p>
+        </div>
+        <a href="{{ url_for('admin_projects') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Projects
+        </a>
+    </div>
+
+    <!-- DPR - Daily Progress Reports -->
+    <div class="content-card">
+        <div class="card-header category-header-dpr">
+            <h2><i class="fas fa-file-alt"></i> Daily Progress Reports (DPR)</h2>
+            <span class="badge badge-light">{{ dpr_docs|length }} Documents</span>
+        </div>
+        <div class="card-body">
+            {% if dpr_docs %}
+            <div class="document-grid">
+                {% for doc in dpr_docs %}
+                <div class="document-item">
+                    <div class="doc-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="doc-info">
+                        <h4>{{ doc.document_title }}</h4>
+                        <p><i class="fas fa-user"></i> {{ doc.uploader_name }} | <i class="fas fa-clock"></i> {{ doc.upload_date }}</p>
+                        {% if doc.description %}
+                        <p class="doc-desc">{{ doc.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="doc-actions">
+                        <a href="{{ url_for('download_document', doc_id=doc.id) }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <a href="{{ url_for('admin_delete_document', doc_id=doc.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this document?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted text-center">No DPR documents uploaded yet</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- MOM - Minutes of Meeting -->
+    <div class="content-card">
+        <div class="card-header category-header-mom">
+            <h2><i class="fas fa-clipboard-list"></i> Minutes of Meeting (MOM)</h2>
+            <span class="badge badge-light">{{ mom_docs|length }} Documents</span>
+        </div>
+        <div class="card-body">
+            {% if mom_docs %}
+            <div class="document-grid">
+                {% for doc in mom_docs %}
+                <div class="document-item">
+                    <div class="doc-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="doc-info">
+                        <h4>{{ doc.document_title }}</h4>
+                        <p><i class="fas fa-user"></i> {{ doc.uploader_name }} | <i class="fas fa-clock"></i> {{ doc.upload_date }}</p>
+                        {% if doc.description %}
+                        <p class="doc-desc">{{ doc.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="doc-actions">
+                        <a href="{{ url_for('download_document', doc_id=doc.id) }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <a href="{{ url_for('admin_delete_document', doc_id=doc.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this document?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted text-center">No MOM documents uploaded yet</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Weekly Progress Reports -->
+    <div class="content-card">
+        <div class="card-header category-header-weekly">
+            <h2><i class="fas fa-calendar-week"></i> Weekly Progress Reports</h2>
+            <span class="badge badge-light">{{ weekly_docs|length }} Documents</span>
+        </div>
+        <div class="card-body">
+            {% if weekly_docs %}
+            <div class="document-grid">
+                {% for doc in weekly_docs %}
+                <div class="document-item">
+                    <div class="doc-icon">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <div class="doc-info">
+                        <h4>{{ doc.document_title }}</h4>
+                        <p><i class="fas fa-user"></i> {{ doc.uploader_name }} | <i class="fas fa-clock"></i> {{ doc.upload_date }}</p>
+                        {% if doc.description %}
+                        <p class="doc-desc">{{ doc.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="doc-actions">
+                        <a href="{{ url_for('download_document', doc_id=doc.id) }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <a href="{{ url_for('admin_delete_document', doc_id=doc.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this document?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted text-center">No weekly reports uploaded yet</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Site Photos -->
+    <div class="content-card">
+        <div class="card-header category-header-photos">
+            <h2><i class="fas fa-camera"></i> Site Photos</h2>
+            <span class="badge badge-light">{{ photo_docs|length }} Photos</span>
+        </div>
+        <div class="card-body">
+            {% if photo_docs %}
+            <div class="document-grid">
+                {% for doc in photo_docs %}
+                <div class="document-item">
+                    <div class="doc-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="doc-info">
+                        <h4>{{ doc.document_title }}</h4>
+                        <p><i class="fas fa-user"></i> {{ doc.uploader_name }} | <i class="fas fa-clock"></i> {{ doc.upload_date }}</p>
+                        {% if doc.description %}
+                        <p class="doc-desc">{{ doc.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="doc-actions">
+                        <a href="{{ url_for('download_document', doc_id=doc.id) }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <a href="{{ url_for('admin_delete_document', doc_id=doc.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this photo?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted text-center">No site photos uploaded yet</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

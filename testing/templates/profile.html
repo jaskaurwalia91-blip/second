@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - JKW Construction{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="page-header">
+        <h1><i class="fas fa-user"></i> My Profile</h1>
+    </div>
+
+    <div class="content-card">
+        <form method="POST" action="{{ url_for('update_profile') }}">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" value="{{ session.username }}" disabled>
+                <small>Username cannot be changed</small>
+            </div>
+
+            <div class="form-group">
+                <label for="full_name">Full Name *</label>
+                <input type="text" id="full_name" name="full_name" value="{{ session.full_name }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="">
+            </div>
+
+            <div class="form-group">
+                <label for="role">Role</label>
+                <input type="text" id="role" value="{{ session.role|upper }}" disabled>
+            </div>
+
+            <hr>
+
+            <h3>Change Password</h3>
+            <div class="form-group">
+                <label for="current_password">Current Password</label>
+                <input type="password" id="current_password" name="current_password">
+            </div>
+
+            <div class="form-group">
+                <label for="new_password">New Password</label>
+                <input type="password" id="new_password" name="new_password">
+                <small>Leave blank if you don't want to change password</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Update Profile
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

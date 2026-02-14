@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - JKW Construction{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="page-header">
+        <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+        <p>Welcome, {{ session.full_name }}!</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card stat-primary">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_users }}</h3>
+                <p>Total Users</p>
+            </div>
+        </div>
+
+        <div class="stat-card stat-success">
+            <div class="stat-icon">
+                <i class="fas fa-project-diagram"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_projects }}</h3>
+                <p>Total Projects</p>
+            </div>
+        </div>
+
+        <div class="stat-card stat-info">
+            <div class="stat-icon">
+                <i class="fas fa-folder"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_documents }}</h3>
+                <p>Total Documents</p>
+            </div>
+        </div>
+
+        <div class="stat-card stat-warning">
+            <div class="stat-icon">
+                <i class="fas fa-user-friends"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_staff }}</h3>
+                <p>Staff Members</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Categories -->
+    <div class="content-card">
+        <div class="card-header">
+            <h2><i class="fas fa-chart-bar"></i> Documents by Category</h2>
+        </div>
+        <div class="card-body">
+            <div class="category-grid">
+                <div class="category-card category-dpr">
+                    <div class="category-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="category-info">
+                        <h3>{{ dpr_count }}</h3>
+                        <p>Daily Progress Reports</p>
+                    </div>
+                </div>
+
+                <div class="category-card category-mom">
+                    <div class="category-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="category-info">
+                        <h3>{{ mom_count }}</h3>
+                        <p>Minutes of Meeting</p>
+                    </div>
+                </div>
+
+                <div class="category-card category-weekly">
+                    <div class="category-icon">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <div class="category-info">
+                        <h3>{{ weekly_count }}</h3>
+                        <p>Weekly Reports</p>
+                    </div>
+                </div>
+
+                <div class="category-card category-photos">
+                    <div class="category-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div class="category-info">
+                        <h3>{{ photos_count }}</h3>
+                        <p>Site Photos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Documents -->
+    <div class="content-card">
+        <div class="card-header">
+            <h2><i class="fas fa-clock"></i> Recent Documents</h2>
+            <a href="{{ url_for('admin_documents') }}" class="btn btn-primary btn-sm">View All</a>
+        </div>
+        <div class="card-body">
+            {% if recent_docs %}
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Document Title</th>
+                            <th>Project</th>
+                            <th>Category</th>
+                            <th>Uploaded By</th>
+                            <th>Upload Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in recent_docs %}
+                        <tr>
+                            <td>{{ doc.document_title }}</td>
+                            <td>{{ doc.project_name }}</td>
+                            <td><span class="badge badge-category-{{ doc.category.lower() }}">{{ doc.category.replace('_', ' ') }}</span></td>
+                            <td>{{ doc.uploader_name }}</td>
+                            <td>{{ doc.upload_date }}</td>
+                            <td>
+                                <a href="{{ url_for('download_document', doc_id=doc.id) }}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No documents uploaded yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

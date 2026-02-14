@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Projects - JKW Construction{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="page-header">
+        <h1><i class="fas fa-project-diagram"></i> Project Management</h1>
+        <button class="btn btn-primary" onclick="openModal('addProjectModal')">
+            <i class="fas fa-plus"></i> Add New Project
+        </button>
+    </div>
+
+    <div class="projects-grid">
+        {% for project in projects %}
+        <div class="project-card">
+            <div class="project-header">
+                <h3>{{ project.project_name }}</h3>
+                <span class="badge badge-{% if project.status == 'active' %}success{% elif project.status == 'completed' %}info{% else %}warning{% endif %}">
+                    {{ project.status|upper }}
+                </span>
+            </div>
+            <div class="project-body">
+                <p><i class="fas fa-code"></i> <strong>Code:</strong> {{ project.project_code or 'N/A' }}</p>
+                <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> {{ project.location or 'N/A' }}</p>
+                <p><i class="fas fa-user-tie"></i> <strong>Client:</strong> {{ project.client_name or 'N/A' }}</p>
+                <p><i class="fas fa-calendar"></i> <strong>Start Date:</strong> {{ project.start_date or 'N/A' }}</p>
+                <p><i class="fas fa-folder"></i> <strong>Documents:</strong> {{ project.doc_count }}</p>
+            </div>
+            <div class="project-footer">
+                <a href="{{ url_for('admin_project_documents', project_id=project.id) }}" class="btn btn-sm btn-info">
+                    <i class="fas fa-eye"></i> View Documents
+                </a>
+                <button class="btn btn-sm btn-warning" onclick="editProject({{ project.id }}, '{{ project.project_name }}', '{{ project.project_code }}', '{{ project.location }}', '{{ project.client_name }}', '{{ project.start_date }}', '{{ project.description }}', '{{ project.status }}')">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <a href="{{ url_for('admin_delete_project', project_id=project.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure? This will delete all documents associated with this project!')">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Add Project Modal -->
+<div id="addProjectModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Project</h2>
+            <span class="modal-close" onclick="closeModal('addProjectModal')">&times;</span>
+        </div>
+        <form method="POST" action="{{ url_for('admin_add_project') }}">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="project_name">Project Name *</label>
+                    <input type="text" id="project_name" name="project_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="project_code">Project Code</label>
+                    <input type="text" id="project_code" name="project_code" placeholder="e.g., RC-2024-001">
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" name="location">
+                </div>
+                <div class="form-group">
+                    <label for="client_name">Client Name</label>
+                    <input type="text" id="client_name" name="client_name">
+                </div>
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addProjectModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Project</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Project Modal -->
+<div id="editProjectModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Project</h2>
+            <span class="modal-close" onclick="closeModal('editProjectModal')">&times;</span>
+        </div>
+        <form method="POST" id="editProjectForm">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit_project_name">Project Name *</label>
+                    <input type="text" id="edit_project_name" name="project_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_project_code">Project Code</label>
+                    <input type="text" id="edit_project_code" name="project_code">
+                </div>
+                <div class="form-group">
+                    <label for="edit_location">Location</label>
+                    <input type="text" id="edit_location" name="location">
+                </div>
+                <div class="form-group">
+                    <label for="edit_client_name">Client Name</label>
+                    <input type="text" id="edit_client_name" name="client_name">
+                </div>
+                <div class="form-group">
+                    <label for="edit_start_date">Start Date</label>
+                    <input type="date" id="edit_start_date" name="start_date">
+                </div>
+                <div class="form-group">
+                    <label for="edit_description">Description</label>
+                    <textarea id="edit_description" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit_status">Status *</label>
+                    <select id="edit_status" name="status" required>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="on-hold">On Hold</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editProjectModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Project</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function editProject(projectId, name, code, location, client, startDate, description, status) {
+    document.getElementById('edit_project_name').value = name;
+    document.getElementById('edit_project_code').value = code || '';
+    document.getElementById('edit_location').value = location || '';
+    document.getElementById('edit_client_name').value = client || '';
+    document.getElementById('edit_start_date').value = startDate || '';
+    document.getElementById('edit_description').value = description || '';
+    document.getElementById('edit_status').value = status;
+    document.getElementById('editProjectForm').action = '/admin/project/edit/' + projectId;
+    openModal('editProjectModal');
+}
+</script>
+{% endblock %}
